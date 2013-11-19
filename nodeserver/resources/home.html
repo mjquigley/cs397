@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Target</title>
+		<link rel="stylesheet" href='/style/style.css' type='style/css'/>
+		<script type='text/javascript' src='/scripts/raphael-min.js'></script>
+		<script type='text/javascript' src='/scripts/drawTarget.js'></script>
+
+		<script type='text/javascript'>
+		    var target;
+		    window.onload = function() {
+				target = new Target();
+			}
+			var host = window.document.location.host.replace(/:.*/, '');
+			var ws = new WebSocket('ws://' + host + ':8001');
+			ws.onmessage = function (event) { 
+				console.log(event);
+				console.log(JSON.parse(event.data));
+				var hit = JSON.parse(event.data);
+				target.addHit(hit.x, hit.y, 0);
+			}
+			window.onbeforeunload = function(){
+				ws.onclose = function(){}
+				//ws.close();
+			}
+		</script>
+	</head>
+	<body>
+		<div id='sidebar'>
+			<ul>
+				<li>Game Mode</li>
+				<li>Practice Mode</li>
+			</ul>
+		</div>
+		<div id='target_canvas'>
+		</div>
+	</body>
+</html>

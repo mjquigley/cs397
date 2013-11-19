@@ -1,0 +1,11 @@
+#sidebar{
+	float: left;
+	background: #222;
+	width: 400px;
+}
+#target_canvas{
+	width: 500px;
+	height: 500px;
+	border: 1px solid #222;
+	float: left;
+}
