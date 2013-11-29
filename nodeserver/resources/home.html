@@ -2,15 +2,14 @@
 <html>
 	<head>
 		<title>Target</title>
-		<link rel="stylesheet" href='/style/style.css' type='style/css'/>
-		<script type='text/javascript' src='/scripts/raphael-min.js'></script>
-		<script type='text/javascript' src='/scripts/drawTarget.js'></script>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    	<!-- Bootstrap -->
+    	<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link rel="stylesheet" href='/css/style.css' type='style/css'/>
+		<script type='text/javascript' src='/js/raphael-min.js'></script>
+		<script type='text/javascript' src='/js/drawTarget.js'></script>
 
 		<script type='text/javascript'>
-		    var target;
-		    window.onload = function() {
-				target = new Target();
-			}
 			var host = window.document.location.host.replace(/:.*/, '');
 			var ws = new WebSocket('ws://' + host + ':8001');
 			ws.onmessage = function (event) { 
@@ -21,18 +20,50 @@
 			}
 			window.onbeforeunload = function(){
 				ws.onclose = function(){}
-				//ws.close();
 			}
 		</script>
 	</head>
 	<body>
-		<div id='sidebar'>
-			<ul>
-				<li>Game Mode</li>
-				<li>Practice Mode</li>
-			</ul>
-		</div>
-		<div id='target_canvas'>
-		</div>
+	    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	    <script src="/js/jquery.min.js"></script>
+	    <!-- Include all compiled plugins (below), or include individual files as needed -->
+	    <script src="js/bootstrap.min.js"></script>
+		<div class="page-container">
+		  
+			<!-- top navbar -->
+		    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+		       <div class="container">
+		    	<div class="navbar-header">
+		           <button type="button" class="navbar-toggle" data-toggle="offcanvas" data-target=".sidebar-nav">
+		             <span class="icon-bar"></span>
+		             <span class="icon-bar"></span>
+		             <span class="icon-bar"></span>
+		           </button>
+		           <a class="navbar-brand" href="#">Project Name</a>
+		    	</div>
+		       </div>
+		    </div>
+		      
+		    <div class="container">
+		      <div class="row row-offcanvas row-offcanvas-left">
+		        
+		        <!-- sidebar -->
+		        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+		            <ul class="nav">
+		              <li class="active"><a href="#">Home</a></li>
+		              <li><a href="#">Link 1</a></li>
+		              <li><a href="#">Link 2</a></li>
+		              <li><a href="#">Link 3</a></li>              
+		            </ul>
+		        </div>
+		  	
+		        <!-- main area -->
+		        <div class="col-xs-12 col-sm-9">
+		        	<div id='target_canvas'>
+					</div> 
+		        </div><!-- /.col-xs-12 main -->
+		    </div><!--/.row-->
+		  </div><!--/.container-->
+		</div><!--/.page-container-->
 	</body>
 </html>

@@ -10,11 +10,19 @@ exports.mimeTypes = {
 exports.resolveType = function (filename){
 	var splitString = filename.split('.');
 	var extension = splitString[splitString.length - 1];
+	splitString.pop();
+	var base = splitString.join('.');
 	if (exports.mimeTypes[extension]){
 		return exports.mimeTypes[extension];
 	} else {
 		return exports.mimeTypes['.default'];
 	}
+}
+exports.getScriptForResource = function(resourceName){
+	var splitString = filename.split('.');
+	splitString.pop();
+	var base = splitString.join('.');
+	return "/resources/" + base + ".js";
 }
 
 exports.loadResource = function (filename, request, response){
@@ -23,7 +31,15 @@ exports.loadResource = function (filename, request, response){
 			console.log("file not found: " + filename);
 			return exports.pageNotFound(request, response);
 		}
-		response.writeHead(200, {"Content-Type": exports.resolveType(filename)});
+		var headerSent = false;
+		var resourceScript = exports.getScriptForResource(filename);
+		if (fs.exists(resourceScript)){
+			headerSent = require(resourceScript).run(request, response);
+
+		}
+		if (!headerSent){
+			response.writeHead(200, {"Content-Type": exports.resolveType(filename)});
+		}
 		var fileStream = fs.createReadStream(filename);
 		fileStream.pipe(response);
 	});

@@ -10,7 +10,7 @@ serialInput.stdout.on('data', function(data){
 	var input = JSON.parse(data);
 	if (input.x && input.y){
 		socketServer.sendCoordinate(input.x, input.y);
-		model.saveCoordinate(input.x, input.y);
+		(new model.Hit(input.x, input.y)).save();
 	}
 });
 
