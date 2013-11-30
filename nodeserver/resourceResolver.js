@@ -18,31 +18,34 @@ exports.resolveType = function (filename){
 		return exports.mimeTypes['.default'];
 	}
 }
-exports.getScriptForResource = function(resourceName){
+exports.getScriptForResource = function(filename){
 	var splitString = filename.split('.');
 	splitString.pop();
 	var base = splitString.join('.');
-	return "/resources/" + base + ".js";
+	base = base.replace('./', '');
+	return "./resources/" + base + ".js";
 }
 
 exports.loadResource = function (filename, request, response){
-	fs.exists(filename, function (exists){
+	var resourceScript = exports.getScriptForResource(filename);
+	fs.exists(resourceScript, function(exists){
 		if (!exists){
-			console.log("file not found: " + filename);
-			return exports.pageNotFound(request, response);
-		}
-		var headerSent = false;
-		var resourceScript = exports.getScriptForResource(filename);
-		if (fs.exists(resourceScript)){
-			headerSent = require(resourceScript).run(request, response);
+			fs.exists(filename, function (exists){
+				if (!exists){
+					console.log("file not found: " + filename);
+					return exports.pageNotFound(request, response);
+				}
 
+				response.writeHead(200, {"Content-Type": exports.resolveType(filename)});
+				var fileStream = fs.createReadStream(filename);
+				fileStream.pipe(response);
+		});
+		} else {
+			require(resourceScript).run(filename, request, response);	
 		}
-		if (!headerSent){
-			response.writeHead(200, {"Content-Type": exports.resolveType(filename)});
-		}
-		var fileStream = fs.createReadStream(filename);
-		fileStream.pipe(response);
 	});
+	
+
 }
 
 exports.pageNotFound = function (request, response){

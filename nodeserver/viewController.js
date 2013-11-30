@@ -10,7 +10,11 @@ serialInput.stdout.on('data', function(data){
 	var input = JSON.parse(data);
 	if (input.x && input.y){
 		socketServer.sendCoordinate(input.x, input.y);
-		(new model.Hit(input.x, input.y)).save();
+		model.Session.getActiveGame(function(activeGame){
+			if (activeGame){
+				(new model.Hit(input.x, input.y, new Date(), activeGame.gameId, activeGame.username)).save();
+			}
+		});
 	}
 });
 

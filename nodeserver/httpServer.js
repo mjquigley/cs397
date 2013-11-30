@@ -5,11 +5,10 @@ var fs = require('fs');							//file system module
 var rr = require('./resourceResolver.js');		//file loading module
 
 exports.server = http.createServer(function (request, response) {
-	console.log(request);
 	var urlpath = url.parse(request.url, true).pathname;
 
 	if (urlpath == '/'){
-		rr.loadResource('./resources/home.html', request, response);
+		rr.loadResource('./home.html', request, response);
 	} 
 	else {
 		rr.loadResource('.'+urlpath, request, response);
