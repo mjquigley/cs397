@@ -4,6 +4,5 @@
 	rebuild model using callbacks and ensure that all id varibles read from database use _id instead of id
 
 -Document model
--Use passwords with users
 -Integrate games + users
 -hash passwords

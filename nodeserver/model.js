@@ -401,7 +401,7 @@ exports.Session.create = function(username, password, callback){
 		}
 		var game = new exports.Game([player.id, null]);
 		game.save(function(game){
-			exports.db.sessions.save({username: username, password: password, gameId: game.id}, function(error, saved){
+			exports.db.sessions.save({username: username, password: password, gameId: game.id, timestamp: new Date()}, function(error, saved){
 				if (error || !saved){
 					console.log("Error saving session:  " + error );
 					if (callback && typeof(callback) === "function") { 
@@ -437,7 +437,7 @@ exports.Session.prototype.validate = function(callback){
 
 
 exports.Session.getActiveGame = function(callback){
-	exports.db.sessions.find({}).sort({timestamp:1}).limit(1, function(err, session){
+	exports.db.sessions.find({}).sort({timestamp:-1}).limit(1, function(err, session){
 		if (!session || !session[0]){
 			console.log("session not found")
 			if (callback && typeof(callback) === "function") { 
@@ -457,7 +457,65 @@ exports.Session.getActiveGame = function(callback){
 				callback(new exports.Session(session._id, player.id, session.password, session.gameId, session.timestamp));
 			}
 		});
+	});
+}
+/***
+	cx, cy - center of target
+	r1, r2 - inner and outer radius of ring
+***/
+exports.Ring = function(cx, cy, r1, r2, value){
+	this.cx = cx;
+	this.cy = cy;
+	this.r1 = r1;
+	this.r2 = r2;
+	this.value = value;
+}
+exports.Ring.prototype.inRing = function(x, y){
+	function distance(x1, y1, x2, y2){
+		return Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
+	}
+	var pointRadius = distance(x, y, this.cx, this.cy);
+	return (pointRadius >= this.r1 && pointRadius <= this.r2);
+}
+exports.Target = function(width, height){
+	this.rings = new Array();
+	cx = width/2;
+	cy = height/2;
+	this.rings.push(new exports.Ring(cx, cy, 0, 49, 100));
+	this.rings.push(new exports.Ring(cx, cy, 50, 100, 50));
+	this.rings.push(new exports.Ring(cx, cy, 101, 149, 25));
+	this.rings.push(new exports.Ring(cx, cy, 150, 200, 15));
+	this.rings.push(new exports.Ring(cx, cy, 151, 249, 10));
+	this.rings.push(new exports.Ring(cx, cy, 250, 300, 5));
+}
 
+exports.Target.prototype.hitValue = function(hit){
+	for (var i=0; i<this.rings.length; i++){
+		if (this.rings[i].inRing(hit.x, hit.y)){
+			return this.rings[i].value;
+		}
+	}
+	return 0;
+}
 
+exports.basicTarget = new exports.Target(500, 500);
+
+exports.getScores = function(gameId, callback){
+	var player1Score = 0, 
+	player2Score = 0;
+	exports.Game.fromId(gameId, function(game){
+		exports.Hit.fromDB(gameId, null, function(hits){
+			for(var i = 0; i < hits.length; i++){
+				var hitValue = exports.basicTarget.hitValue(hits[i]);
+				if (hits[i].playerId.toString() == game.player1.toString()){
+					player1Score += hitValue;
+				} else {
+					player2Score += hitValue;
+				}
+			}
+			if (callback && typeof(callback) === "function") { 
+				callback(player1Score, player2Score)
+			}
+		});
 	});
 }

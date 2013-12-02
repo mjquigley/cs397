@@ -8,7 +8,7 @@ exports.wss.broadcast = function(data){
 		this.clients[i].send(data);
 	}
 }
-exports.sendCoordinate = function(x, y){
-	console.log("Broadcasting Coordinate: (" + x + ", " + y + ").")
-	exports.wss.broadcast({x : x, y : y});
+exports.sendData = function(x, y, score1, score2){
+	console.log("Broadcasting Coordinate: (" + x + ", " + y + ") score1: "+score1+" | score2: "+score2+".")
+	exports.wss.broadcast({x : x, y : y, score1: score1, score2: score2});
 }
